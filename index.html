@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f6fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      width: 320px;
+      text-align: center;
+    }
+    .profile-pic {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid #007bff;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    h2 {
+      margin: 10px 0 5px;
+    }
+    p {
+      color: #555;
+      font-size: 14px;
+    }
+    .buttons {
+      margin-top: 20px;
+    }
+    button {
+      margin: 8px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .datetime {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #333;
+    }
+    input[type="file"] {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <input type="file" id="upload" accept="image/*" />
+    <img src="IMG_6015.PNG" id="profileImg" class="profile-pic" alt="Profile Picture" onclick="document.getElementById('upload').click()" />
+
+    <h2 aria-label="User Name">Oloruntoba Komolafe</h2>
+    <p>Web Developer | Designer | Creator</p>
+
+    <div class="datetime" id="datetime"></div>
+
+    <div class="buttons">
+      <button onclick="location.href='about.html'">About Us</button>|
+      <button onclick="location.href='contact.html'">Contact Us</button>
+    </div>
+  </div>
+
+  <script>
+    // Image upload
+    const upload = document.getElementById("upload");
+    const profileImg = document.getElementById("profileImg");
+
+    upload.addEventListener("change", function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          profileImg.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Live time and date
+    function updateDateTime() {
+      const now = new Date();
+      const formatted = now.toLocaleString();
+      document.getElementById("datetime").textContent = formatted;
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+  </script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Us</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 40px;
+      text-align: center;
+    }
+    h1 {
+      color: #007bff;
+    }
+    form {
+      max-width: 400px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: left;
+    }
+    label {
+      display: block;
+      margin-top: 8px;
+      font-weight: 600;
+    }
+    input, textarea, select {
+      width: 100%;
+      margin: 6px 0 2px 0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+    .actions {
+      text-align: center;
+      margin-top: 12px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .error {
+      color: #b00020;
+      font-size: 13px;
+      margin-top: 4px;
+      display: none;
+    }
+    .error[aria-hidden="false"] {
+      display: block;
+    }
+    .success {
+      background: #e6ffed;
+      color: #0a7c3f;
+      border: 1px solid #b7f0c6;
+      padding: 10px;
+      border-radius: 8px;
+      max-width: 400px;
+      margin: 16px auto;
+      display: none;
+    }
+    .success[aria-hidden="false"] {
+      display: block;
+    }
+
+    /* form-level error message */
+    .formError {
+      color: #b00020;
+      background: #fff0f0;
+      border: 1px solid #f5c2c2;
+      padding: 10px;
+      border-radius: 8px;
+      max-width: 400px;
+      margin: 8px auto;
+      display: none;
+    }
+    .formError[aria-hidden="false"] {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>Contact Us</h1>
+
+  <div id="successMessage" class="success" role="status" aria-live="polite" aria-hidden="true"></div>
+
+  <div id="formError" class="formError" role="alert" aria-live="assertive" aria-hidden="true"></div>
+
+  <form id="contactForm" novalidate>
+    <label for="fullName">Full Name</label>
+    <input id="fullName" name="fullName" type="text" placeholder="Your full name" required aria-describedby="fullNameError" />
+    <span id="fullNameError" class="error" role="alert" aria-hidden="true"></span>
+
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" placeholder="name@example.com" required aria-describedby="emailError" />
+    <span id="emailError" class="error" role="alert" aria-hidden="true"></span>
+
+    <label for="subject">Subject</label>
+    <input id="subject" name="subject" type="text" value="Test Contact Subject" required aria-describedby="subjectError" />
+    <span id="subjectError" class="error" role="alert" aria-hidden="true"></span>
+
+    <label for="message">Message</label>
+    <textarea id="message" name="message" rows="5" placeholder="Your message (at least 10 characters)" required aria-describedby="messageError"></textarea>
+    <span id="messageError" class="error" role="alert" aria-hidden="true"></span>
+
+    <div class="actions">
+      <button type="submit">Send Message</button>
+      <button type="submit" id="submitButton" style="margin-left:8px">Submit</button>
+    </div>
+  </form>
+
+  <br />
+  <button onclick="location.href='index.html'">Back to Profile</button>
+
+  <script>
+    // Basic client-side validation with accessible error associations
+    (function () {
+      const form = document.getElementById('contactForm');
+      const successMsg = document.getElementById('successMessage');
+      const formError = document.getElementById('formError');
+
+      const fields = {
+        fullName: {
+          el: document.getElementById('fullName'),
+          errorEl: document.getElementById('fullNameError'),
+          validate: function () {
+            const v = this.el.value.trim();
+            if (!v) return 'Full name is required.';
+            return '';
+          }
+        },
+        email: {
+          el: document.getElementById('email'),
+          errorEl: document.getElementById('emailError'),
+          validate: function () {
+            const v = this.el.value.trim();
+            if (!v) return 'Email is required.';
+            // rely on HTML5 email pattern for basic validation, but add regex fallback
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!re.test(v)) return 'Please enter a valid email address.';
+            return '';
+          }
+        },
+        subject: {
+          el: document.getElementById('subject'),
+          errorEl: document.getElementById('subjectError'),
+          validate: function () {
+            const v = this.el.value.trim();
+            if (!v) return 'Subject is required.';
+            return '';
+          }
+        },
+        message: {
+          el: document.getElementById('message'),
+          errorEl: document.getElementById('messageError'),
+          validate: function () {
+            const v = this.el.value.trim();
+            if (!v) return 'Message is required.';
+            if (v.length < 10) return 'Message must be at least 10 characters.';
+            return '';
+          }
+        }
+      };
+
+      function showError(field, msg) {
+        const { el, errorEl } = field;
+        if (msg) {
+          errorEl.textContent = msg;
+          errorEl.setAttribute('aria-hidden', 'false');
+          el.setAttribute('aria-invalid', 'true');
+          el.setAttribute('aria-describedby', errorEl.id);
+        } else {
+          errorEl.textContent = '';
+          errorEl.setAttribute('aria-hidden', 'true');
+          el.removeAttribute('aria-invalid');
+        }
+      }
+
+      function validateAll() {
+        let firstInvalid = null;
+        let valid = true;
+        Object.keys(fields).forEach(key => {
+          const f = fields[key];
+          const msg = f.validate();
+          if (msg) {
+            valid = false;
+            showError(f, msg);
+            if (!firstInvalid) firstInvalid = f.el;
+          } else {
+            showError(f, '');
+          }
+        });
+        if (firstInvalid) firstInvalid.focus();
+        return valid;
+      }
+
+      // Live validation on blur
+      Object.keys(fields).forEach(key => {
+        const f = fields[key];
+        f.el.addEventListener('blur', () => {
+          const msg = f.validate();
+          showError(f, msg);
+        });
+        f.el.addEventListener('input', () => {
+          // clear error while typing
+          if (f.errorEl.getAttribute('aria-hidden') === 'false') {
+            const msg = f.validate();
+            showError(f, msg);
+          }
+        });
+      });
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        // reset messages
+        successMsg.setAttribute('aria-hidden', 'true');
+        successMsg.textContent = '';
+        formError.setAttribute('aria-hidden', 'true');
+        formError.textContent = '';
+
+        if (validateAll()) {
+          // simulate successful submission
+          successMsg.textContent = 'Your message has been sent successfully. Thank you!';
+          successMsg.setAttribute('aria-hidden', 'false');
+          // reset form
+          form.reset();
+          // restore subject default value after reset
+          fields.subject.el.value = 'Test Contact Subject';
+          // reset ARIA states
+          Object.keys(fields).forEach(key => {
+            const f = fields[key];
+            showError(f, '');
+          });
+        } else {
+          // show form-level error
+          formError.textContent = 'Please fix the errors highlighted below.';
+          formError.setAttribute('aria-hidden', 'false');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
